@@ -5,22 +5,23 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const LiveReloadPlugin = require('webpack-livereload-plugin');
 const env = require('./environment');
 
-const liveReloadOptionsFile = './../../../.webpack.livereload.local';
-const mandatoryLiveReloadOptions = {appendScriptTag: true};
-
-let finalLiveReloadOptions = Object.assign({}, mandatoryLiveReloadOptions);
-
-
-if (fs.lstatSync('.webpack.livereload.local.js').isFile()) {
-    const liveReloadOptions = require(liveReloadOptionsFile);
-    finalLiveReloadOptions = Object.assign({}, finalLiveReloadOptions, liveReloadOptions);
-}
-
 //
 // Prevent from failing, when NEOS_BUILD_ROOT env variable isn't set
 // (e.g. when extending this config from storybook)
 //
 const rootPath = env.rootPath || __dirname;
+
+const liveReloadOptionsFileName = '.webpack.livereload.local.js';
+const liveReloadOptionsFile = path.join(rootPath, liveReloadOptionsFileName);
+
+const mandatoryLiveReloadOptions = {appendScriptTag: true};
+
+let finalLiveReloadOptions = Object.assign({}, mandatoryLiveReloadOptions);
+
+if (fs.existsSync(liveReloadOptionsFile) && fs.lstatSync(liveReloadOptionsFile).isFile()) {
+    const liveReloadOptions = require(liveReloadOptionsFile);
+    finalLiveReloadOptions = Object.assign({}, finalLiveReloadOptions, liveReloadOptions);
+}
 
 const extractCss = new ExtractTextPlugin({
     publicPath: './../',
